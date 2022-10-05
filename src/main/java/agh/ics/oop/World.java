@@ -20,7 +20,7 @@ public class World {
                     results[i] = Direction.LEFT;
                     break;
                 default:
-                    results[i] = null;
+                    results[i] = Direction.FAILED;
                     break;
             }
         }
@@ -44,6 +44,7 @@ public class World {
                     System.out.println("Zwierzak skręca w lewo");
                     break;
                 default:
+                    System.out.println("Niepoprawna komenda");
                     break;
             }
         }
