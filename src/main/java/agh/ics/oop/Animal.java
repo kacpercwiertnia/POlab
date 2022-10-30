@@ -1,11 +1,36 @@
 package agh.ics.oop;
 
 public class Animal {
-    private MapDirection direction = MapDirection.NORTH;
-    private Vector2d coordinates = new Vector2d(2,2);
+    private MapDirection direction;
+    private Vector2d coordinates;
+    private IWorldMap map;
+    public Animal(IWorldMap map, Vector2d initialPosition){
+        this.direction = MapDirection.NORTH;
+        this.map = map;
+        this.coordinates = initialPosition;
+    }
+
+    public Animal(IWorldMap map){
+        this(map, new Vector2d(2,2));
+    }
+
+    public Animal(){
+        this(new RectangularMap(5,5));
+    }
 
     public String toString(){
-        return "Zwierze znajduje się na współrzędnych: " + this.coordinates.toString() + " w kierunku: " + this.direction.toString();
+        switch (this.direction){
+            case NORTH:
+                return this.coordinates.toString()+" N";
+            case EAST:
+                return this.coordinates.toString()+" E";
+            case SOUTH:
+                return this.coordinates.toString()+" S";
+            case WEST:
+                return this.coordinates.toString()+" W";
+            default:
+                return "ERR";
+        }
     }
 
     public boolean isAt(Vector2d position){
@@ -14,6 +39,10 @@ public class Animal {
 
     public MapDirection getDirection(){
         return this.direction;
+    }
+
+    public Vector2d getCoordinates(){
+        return this.coordinates;
     }
 
     public void move(MoveDirection direction){
@@ -25,12 +54,12 @@ public class Animal {
                 this.direction = this.direction.previous();
                 break;
             case FORWARD:
-                if(this.coordinates.add(this.direction.toUnitVector()).follows(new Vector2d(0,0)) && this.coordinates.add(this.direction.toUnitVector()).precedes(new Vector2d(4,4))) {
+                if(map.canMoveTo(this.coordinates.add(this.direction.toUnitVector()))){
                     this.coordinates = this.coordinates.add(this.direction.toUnitVector());
                 }
                 break;
             case BACKWARD:
-                if(this.coordinates.subtract(this.direction.toUnitVector()).follows(new Vector2d(0,0)) && this.coordinates.subtract(this.direction.toUnitVector()).precedes(new Vector2d(4,4))) {
+                if(map.canMoveTo(this.coordinates.subtract(this.direction.toUnitVector()))){
                     this.coordinates = this.coordinates.subtract(this.direction.toUnitVector());
                 }
                 break;
