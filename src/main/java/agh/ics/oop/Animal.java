@@ -1,13 +1,13 @@
 package agh.ics.oop;
 
-public class Animal {
+public class Animal implements IMapElement{
     private MapDirection direction;
-    private Vector2d coordinates;
+    private Vector2d position;
     private IWorldMap map;
     public Animal(IWorldMap map, Vector2d initialPosition){
         this.direction = MapDirection.NORTH;
         this.map = map;
-        this.coordinates = initialPosition;
+        this.position = initialPosition;
     }
 
     public Animal(IWorldMap map){
@@ -21,28 +21,28 @@ public class Animal {
     public String toString(){
         switch (this.direction){
             case NORTH:
-                return this.coordinates.toString()+" N";
+                return "^";
             case EAST:
-                return this.coordinates.toString()+" E";
+                return ">";
             case SOUTH:
-                return this.coordinates.toString()+" S";
+                return "v";
             case WEST:
-                return this.coordinates.toString()+" W";
+                return "<";
             default:
                 return "ERR";
         }
     }
 
     public boolean isAt(Vector2d position){
-        return this.coordinates.equals(position);
+        return this.position.equals(position);
     }
 
     public MapDirection getDirection(){
         return this.direction;
     }
 
-    public Vector2d getCoordinates(){
-        return this.coordinates;
+    public Vector2d getPosition(){
+        return this.position;
     }
 
     public void move(MoveDirection direction){
@@ -54,13 +54,13 @@ public class Animal {
                 this.direction = this.direction.previous();
                 break;
             case FORWARD:
-                if(map.canMoveTo(this.coordinates.add(this.direction.toUnitVector()))){
-                    this.coordinates = this.coordinates.add(this.direction.toUnitVector());
+                if(map.canMoveTo(this.position.add(this.direction.toUnitVector()))){
+                    this.position = this.position.add(this.direction.toUnitVector());
                 }
                 break;
             case BACKWARD:
-                if(map.canMoveTo(this.coordinates.subtract(this.direction.toUnitVector()))){
-                    this.coordinates = this.coordinates.subtract(this.direction.toUnitVector());
+                if(map.canMoveTo(this.position.subtract(this.direction.toUnitVector()))){
+                    this.position = this.position.subtract(this.direction.toUnitVector());
                 }
                 break;
             default:

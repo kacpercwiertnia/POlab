@@ -3,13 +3,9 @@ package agh.ics.oop;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RectangularMap implements IWorldMap{
+public class RectangularMap extends AbstractWorldMap{
     private final int width;
     private final int height;
-    private final Vector2d lowerLeft;
-    private final Vector2d upperRight;
-    private final List<Animal> animals;
-    private final MapVisualizer visualizer;
 
     public RectangularMap(int width, int height){
         this.width = width;
@@ -21,43 +17,32 @@ public class RectangularMap implements IWorldMap{
     }
 
     @Override
-    public boolean canMoveTo(Vector2d position) {
-        return position.follows(lowerLeft) && position.precedes(upperRight) && !isOccupied(position);
+    boolean checkIfCanMove(Vector2d position) {
+        return position.precedes(upperRight) && !isOccupied(position);
     }
 
     @Override
-    public boolean place(Animal animal) {
-        if(!isOccupied(animal.getCoordinates())){
-            animals.add(animal);
-            return true;
-        }
-
+    boolean checkIfCanPlace(Animal animal) {
         return false;
     }
 
     @Override
-    public boolean isOccupied(Vector2d position) {
-        for( Animal animal: animals){
-            if(animal.isAt(position)){
-                return true;
-            }
-        }
-
+    boolean checkIfOccupied(Vector2d position) {
         return false;
     }
 
     @Override
-    public Object objectAt(Vector2d position) {
-        for( Animal animal: animals){
-            if(animal.isAt(position)){
-                return animal;
-            }
-        }
-
+    Object checkObjectAt(Vector2d position) {
         return null;
     }
 
-    public String toString(){
-        return visualizer.draw(lowerLeft, upperRight);
+    @Override
+    Vector2d checkLowerLeft() {
+        return lowerLeft;
+    }
+
+    @Override
+    Vector2d checkUpperRight() {
+        return upperRight;
     }
 }
