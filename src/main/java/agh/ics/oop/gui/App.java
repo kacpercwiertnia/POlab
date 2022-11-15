@@ -19,6 +19,7 @@ public class App extends Application {
     @Override
     public void init() throws Exception{
         super.init();
+
         Parameters parameters = getParameters();
         String[] args = parameters.getRaw().toArray(new String[0]);
 
