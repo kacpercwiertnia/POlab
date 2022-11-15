@@ -8,7 +8,10 @@ class AnimalTest {
 
     @Test
     void test() {
-        Animal animal = new Animal(new RectangularMap(10,1), new Vector2d(0,0));
+        IWorldMap mapTest = new RectangularMap(10,1);
+        assertThrows(IllegalArgumentException.class, () -> mapTest.place(new Animal(mapTest,new Vector2d(-1,-1))));
+
+        Animal animal = new Animal(mapTest, new Vector2d(0,0));
         assertTrue(animal.isAt(new Vector2d(0,0)));
 
         animal.move(MoveDirection.RIGHT);
@@ -73,7 +76,9 @@ class AnimalTest {
         animal.move(MoveDirection.FORWARD);
         assertTrue(animal.isAt(new Vector2d(9,0)));
 
-        String[] args = {"f", "b", "r", "l", "f", "f", "r", "r", "f", "f", "f", "f", "f", "f", "f", "f"};
+        String[] args = {"f", "b", "r", "l", "f", "f", "r", "r", "f", "f", "f", "f", "f", "f", "f"};
+        String[] argsTest = {"f", "a", "b"};
+        assertThrows(IllegalArgumentException.class, () -> new OptionsParser().parse(argsTest));
         MoveDirection[] directions = new OptionsParser().parse(args);
         IWorldMap map = new RectangularMap(10, 5);
         Vector2d[] positions = { new Vector2d(2,2), new Vector2d(3,4) };

@@ -32,7 +32,7 @@ public class OptionsParser {
                     i++;
                     break;
                 default:
-                    break;
+                    throw new IllegalArgumentException(arg + " is not legal move specification");
             }
         }
 

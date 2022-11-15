@@ -30,6 +30,7 @@ public class GrassField extends AbstractWorldMap{
 
             if( !isOccupied(new Vector2d(x, y))){
                 this.grasses.put(new Vector2d(x,y), new Grass(new Vector2d(x,y)));
+                this.mapBoundary.add(new Vector2d(x,y));
                 grassesPlaced++;
             }
         }
@@ -44,6 +45,7 @@ public class GrassField extends AbstractWorldMap{
 
             if(object instanceof Grass){
                 this.grasses.remove(position);
+                this.mapBoundary.remove(position);
                 placeGrass(1);
                 return true;
             }
@@ -64,7 +66,7 @@ public class GrassField extends AbstractWorldMap{
             return true;
         }
         else{
-            return false;
+            throw new IllegalArgumentException("Position: " + animal.getPosition().toString() + " is occupied");
         }
     }
 
@@ -83,38 +85,13 @@ public class GrassField extends AbstractWorldMap{
     }
 
     @Override
-    Vector2d checkLowerLeft() {
-        int minX = Integer.MAX_VALUE;
-        int minY = Integer.MAX_VALUE;
-
-        for( Vector2d position: this.grasses.keySet() ){
-            minX = Math.min(minX, position.x);
-            minY = Math.min(minY, position.y);
-        }
-
-        for( Vector2d position: this.animals.keySet() ){
-            minX = Math.min(minX, position.x);
-            minY = Math.min(minY, position.y);
-        }
-
-        return new Vector2d(minX, minY);
+    public Vector2d checkLowerLeft() {
+        return this.mapBoundary.getLowerLeft();
     }
 
     @Override
-    Vector2d checkUpperRight() {
-        int maxX = Integer.MIN_VALUE;
-        int maxY = Integer.MIN_VALUE;
-
-        for( Vector2d position: this.grasses.keySet() ){
-            maxX = Math.max(maxX, position.x);
-            maxY = Math.max(maxY, position.y);
-        }
-
-        for( Vector2d position: this.animals.keySet() ){
-            maxX = Math.max(maxX, position.x);
-            maxY = Math.max(maxY, position.y);
-        }
-
-        return new Vector2d(maxX, maxY);
+    public Vector2d checkUpperRight() {
+        return this.mapBoundary.getUpperRight();
     }
+
 }

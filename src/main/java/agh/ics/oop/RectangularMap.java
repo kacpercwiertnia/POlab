@@ -22,7 +22,7 @@ public class RectangularMap extends AbstractWorldMap{
 
     @Override
     boolean checkIfCanPlace(Animal animal) {
-        return false;
+        throw new IllegalArgumentException("Position: " + animal.getPosition().toString() + " is occupied");
     }
 
     @Override
@@ -36,12 +36,13 @@ public class RectangularMap extends AbstractWorldMap{
     }
 
     @Override
-    Vector2d checkLowerLeft() {
-        return lowerLeft;
+    public Vector2d checkLowerLeft() {
+        return this.lowerLeft;
     }
 
     @Override
-    Vector2d checkUpperRight() {
-        return upperRight;
+    public Vector2d checkUpperRight() {
+        return this.upperRight;
     }
+
 }
