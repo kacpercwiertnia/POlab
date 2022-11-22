@@ -12,6 +12,16 @@ public class Grass implements IMapElement{
         return this.position;
     }
 
+    @Override
+    public String getImage() {
+        return "/Users/kacpercwiertnia/JAVA/oolab/src/main/resources/grass.png";
+    }
+
+    @Override
+    public String toCaption() {
+        return "Trawa";
+    }
+
     public String toString(){
         return "*";
     }

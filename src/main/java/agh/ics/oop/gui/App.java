@@ -2,19 +2,26 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.List;
+import java.util.Arrays;
 
-public class App extends Application {
+public class App extends Application implements IMapRefreshObserver{
 
     private AbstractWorldMap map;
+    private GridPane gridPane;
+    private RefreshSimulationEngine engine;
+    private Thread engineThread;
 
     @Override
     public void init() throws Exception{
@@ -24,14 +31,10 @@ public class App extends Application {
         String[] args = parameters.getRaw().toArray(new String[0]);
 
         try {
-            MoveDirection[] directions = new OptionsParser().parse(args);
             Vector2d[] positions = {new Vector2d(0, 0), new Vector2d(5, 5)};
             this.map = new GrassField(10);
-            IEngine engine = new SimulationEngine(directions, this.map, positions);
-
-            System.out.println(this.map.toString());
-            engine.run();
-            System.out.println(this.map.toString());
+            engine = new RefreshSimulationEngine(this.map, positions, 300);
+            engine.addObserver(this);
         } catch (IllegalArgumentException exception) {
             System.out.println(exception);
             System.exit(1);
@@ -39,13 +42,42 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        GridPane gridPane = new GridPane();
-        gridPane.setGridLinesVisible(true);
-        gridPane.setHgap(0);
-        gridPane.setVgap(0);
-        int cellWidth = 30;
-        int cellHeight = 30;
+    public void start(Stage primaryStage){
+        this.gridPane = new GridPane();
+        int cellWidth = 40;
+        int cellHeight = 40;
+        this.gridPane.setHgap(0);
+        this.gridPane.setVgap(0);
+
+        VBox root = new VBox();
+        TextField textField = new TextField();
+        Button button = new Button("Start");
+
+        button.setOnAction(event -> {
+            String[] strMoves = textField.getCharacters().toString().split(" ");
+            MoveDirection[] directions = new OptionsParser().parse(strMoves);
+            this.engine.setMoves(directions);
+            this.engineThread = new Thread(this.engine);
+            this.engineThread.start();
+        });
+
+        root.getChildren().addAll(textField, button);
+
+        root.getChildren().add(this.gridPane);
+
+        this.gridPane.getColumnConstraints().add(new ColumnConstraints(cellWidth));
+        this.gridPane.getRowConstraints().add(new RowConstraints(cellHeight));
+
+        renderScene();
+
+        Scene scene = new Scene(root, 600, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    void renderScene(){
+        int cellWidth = 40;
+        int cellHeight = 40;
 
         int minY = this.map.checkLowerLeft().y;
         int minX = this.map.checkLowerLeft().x;
@@ -54,20 +86,19 @@ public class App extends Application {
 
         Label xyLabel = new Label("y\\x");
         GridPane.setHalignment(xyLabel, HPos.CENTER);
-        gridPane.getColumnConstraints().add(new ColumnConstraints(cellWidth));
-        gridPane.getRowConstraints().add(new RowConstraints(cellHeight));
-        gridPane.add(xyLabel, 0, 0, 1, 1);
+        this.gridPane.add(xyLabel, 0, 0, 1, 1);
 
         for (int i = minY; i < maxY+1; i++) {
             Label label = new Label(Integer.toString(i));
-            gridPane.add(label, 0, maxY - i +1, 1, 1);
-            gridPane.getRowConstraints().add(new RowConstraints(cellHeight));
+            this.gridPane.add(label, 0, maxY - i +1, 1, 1);
+            this.gridPane.getRowConstraints().add(new RowConstraints(cellHeight));
             GridPane.setHalignment(label, HPos.CENTER);
         }
+
         for (int i = minX; i < maxX+1; i++) {
             Label label = new Label(Integer.toString(i));
-            gridPane.add(label, i-minX+1, 0, 1, 1);
-            gridPane.getColumnConstraints().add(new ColumnConstraints(cellWidth));
+            this.gridPane.add(label, i-minX+1, 0, 1, 1);
+            this.gridPane.getColumnConstraints().add(new ColumnConstraints(cellWidth));
             GridPane.setHalignment(label, HPos.CENTER);
         }
 
@@ -75,16 +106,26 @@ public class App extends Application {
             for (int y = minY; y < maxY+1; y++) {
                 Vector2d position = new Vector2d(x, y);
                 if (this.map.isOccupied(position)) {
-                    Object worldMapElement = this.map.objectAt(position);
-                    Label label = new Label(worldMapElement.toString());
-                    GridPane.setHalignment(label, HPos.CENTER);
-                    gridPane.add(label, position.x - minX + 1, maxY - position.y + 1, 1, 1);
+                    IMapElement worldMapElement = (IMapElement) this.map.objectAt(position);
+                    GuiElementBox element = new GuiElementBox(worldMapElement);
+                    VBox box = element.getBox();
+                    GridPane.setHalignment(box, HPos.CENTER);
+                    this.gridPane.add(box, position.x - minX + 1, maxY - position.y + 1, 1, 1);
                 }
             }
         }
 
-        Scene scene = new Scene(gridPane, 400, 400);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        this.gridPane.setGridLinesVisible(true);
+    }
+
+    @Override
+    public void refresh() {
+        Platform.runLater( () -> {
+            this.gridPane.getChildren().clear();
+            this.gridPane.getColumnConstraints().clear();
+            this.gridPane.getRowConstraints().clear();
+            this.gridPane.setGridLinesVisible(false);
+            renderScene();
+        });
     }
 }

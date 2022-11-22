@@ -15,7 +15,7 @@ public class Animal implements IMapElement{
         this.map = map;
         this.position = initialPosition;
         this.observers = new ArrayList<IPositionChangeObserver>();
-        this.observers.add((IPositionChangeObserver) map);
+        addObserver((IPositionChangeObserver) map);
     }
 
     public Animal(IWorldMap map){
@@ -47,6 +47,27 @@ public class Animal implements IMapElement{
 
     public Vector2d getPosition(){
         return this.position;
+    }
+
+    @Override
+    public String getImage() {
+        switch (this.direction){
+            case NORTH:
+                return "/Users/kacpercwiertnia/JAVA/oolab/src/main/resources/up.png";
+            case EAST:
+                return "/Users/kacpercwiertnia/JAVA/oolab/src/main/resources/right.png";
+            case SOUTH:
+                return "/Users/kacpercwiertnia/JAVA/oolab/src/main/resources/down.png";
+            case WEST:
+                return "/Users/kacpercwiertnia/JAVA/oolab/src/main/resources/left.png";
+            default:
+                return "err";
+        }
+    }
+
+    @Override
+    public String toCaption() {
+        return "Z " + this.position.toString();
     }
 
     public void move(MoveDirection direction){
